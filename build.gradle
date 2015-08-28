@@ -1,11 +1,26 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.2.5.RELEASE")
+    }
+}
+apply plugin: 'spring-boot'
 apply plugin: 'java'
+apply plugin: 'eclipse'
 
 repositories {
-    jcenter()
+    mavenCentral()
 }
 
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
 dependencies {
+    compile("org.springframework.boot:spring-boot-starter-web")
+    compile("org.springframework.boot:spring-boot-starter-actuator")
     compile 'org.slf4j:slf4j-api:1.7.12'
 
-    testCompile 'junit:junit:4.12'
+    testCompile("junit:junit")
 }
