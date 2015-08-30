@@ -49,6 +49,8 @@ public class RabbitMQConfig {
     public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory() {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(rabbitConnectionFactory());
+        factory.setConcurrentConsumers(3);
+        factory.setMaxConcurrentConsumers(10);
         return factory;
     }
     
@@ -76,7 +78,7 @@ public class RabbitMQConfig {
     }
     
     @Bean
-    Binding binding(Queue queue, TopicExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(TASK_QUEUE_NAME);
+    Binding binding() {
+        return BindingBuilder.bind(tasksQueue()).to(exchange()).with(TASK_QUEUE_NAME);
     }
 }
