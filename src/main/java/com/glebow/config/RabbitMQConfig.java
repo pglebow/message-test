@@ -17,6 +17,8 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.glebow.error.CustomErrorHandler;
+
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -40,18 +42,19 @@ public class RabbitMQConfig {
 
     @Bean
     public ConnectionFactory rabbitConnectionFactory() {
-        CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
-        connectionFactory.setHost("localhost");
-        return connectionFactory;
+        CachingConnectionFactory cf = new CachingConnectionFactory();
+        cf.setHost("localhost");
+        return cf;
     }
-
+    
     @Bean
     public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory() {
-        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
-        factory.setConnectionFactory(rabbitConnectionFactory());
-        factory.setConcurrentConsumers(3);
-        factory.setMaxConcurrentConsumers(10);
-        return factory;
+        SimpleRabbitListenerContainerFactory f = new SimpleRabbitListenerContainerFactory();
+        f.setConnectionFactory(rabbitConnectionFactory());
+        f.setConcurrentConsumers(3);
+        f.setMaxConcurrentConsumers(10);
+        f.setErrorHandler(new CustomErrorHandler());
+        return f;
     }
     
     @Bean
@@ -63,6 +66,8 @@ public class RabbitMQConfig {
     @Bean
     public RabbitTemplate rabbitTemplate() {
         RabbitTemplate template = new RabbitTemplate(rabbitConnectionFactory());
+        template.setMandatory(true);
+        template.setChannelTransacted(true);
         return template;
     }
 
