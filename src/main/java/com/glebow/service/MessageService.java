@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Service
 @Slf4j
-@EnableScheduling
+//@EnableScheduling
 public class MessageService {
 
     @Autowired
