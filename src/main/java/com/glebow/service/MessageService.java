@@ -3,6 +3,8 @@
  */
 package com.glebow.service;
 
+import java.io.UnsupportedEncodingException;
+
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessageDeliveryMode;
@@ -25,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Service
 @Slf4j
-//@EnableScheduling
+@EnableScheduling
 public class MessageService {
 
     @Autowired
@@ -46,16 +48,17 @@ public class MessageService {
 
     @RabbitListener(queues = "tasks")
     @Transactional(readOnly=false, rollbackFor=IllegalStateException.class)
-    public void taskListener(String id) {
+    public void taskListener(byte[] bytes) throws IllegalStateException, UnsupportedEncodingException {
+    	String s = new String(bytes, "UTF-8");
         if ( ++count % 5 == 0 ) {
-            throw new IllegalStateException("Rolling back " + id);
-        } else {
-            log.info("Consuming " + id);            
+            throw new IllegalStateException("Rolling back " + s);
+        } else {        	
+            log.info("Consuming " + s);            
         }
     }
 
     public void send(String message) {
-        if (message != null && !message.isEmpty()) {
+        if (message != null && !message.isEmpty()) {        	
             Message m = MessageBuilder.withBody(message.getBytes()).setHeader(AmqpHeaders.DELIVERY_MODE, MessageDeliveryMode.PERSISTENT).build();
             log.info("Sending " + message);
             template.convertAndSend(RabbitMQConfig.TASK_QUEUE_NAME, m);
